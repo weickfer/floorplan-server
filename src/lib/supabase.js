@@ -1,0 +1,21 @@
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+
+async function createSignedUploadUrl(fileName) {
+  const uniqueFilename = `${crypto.randomUUID()}-${fileName}`
+  const path = `documents/${uniqueFilename}`
+
+  const { data } = await supabase.storage.from('sheets').createSignedUploadUrl(
+    path,
+  )
+
+  const { publicUrl } = supabase.storage.from('sheets').getPublicUrl(path).data
+
+  return {
+    signedUrl: data.signedUrl,
+    publicUrl,
+  }
+}
+
+module.exports = { supabase, createSignedUploadUrl }
