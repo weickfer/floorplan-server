@@ -1,8 +1,9 @@
 const { Router } = require('express');
 
 const Sheet = require('../models/sheet');
+const Annotation = require('../models/annotation');
 
-const { createSignedUploadUrl } = require('../lib/supabase');
+const { createSignedUploadUrl, createPath, supabase } = require('../lib/supabase');
 
 const router = Router();
 
@@ -31,13 +32,35 @@ router.get('/', async (req, res) => {
   return res.json(sheets)
 })
 
-router.get('/:sheetId', async (req, res) => {
+// router.get('/:sheetId', async (req, res) => {
+//   const sheet = await Sheet.findById(req.params?.sheetId).populate('annotations').select([
+//     'url',
+//     'annotations'
+//   ])
+
+//   return res.json(sheet)
+// })
+
+router.delete('/:sheetId', async (req, res) => {
   const sheet = await Sheet.findById(req.params?.sheetId).populate('annotations').select([
     'url',
     'annotations'
   ])
 
-  return res.json(sheet)
+  if(!sheet) return res.status(404).send()
+
+  const sheetPath = createPath(sheet.url.split('/').pop())
+  const annotationsPaths = sheet.annotations.map(annotation => createPath(
+    annotation.url.split('/').pop()
+  ))
+  const paths = [sheetPath, ...annotationsPaths]
+
+  await supabase.storage.from('sheets').remove(paths)
+
+  await Annotation.deleteMany({ sheet: sheet.id })
+  await Sheet.findOneAndDelete({ id: sheet.id })
+
+  return res.status(200).send()
 })
 
 module.exports = router;
