@@ -32,14 +32,14 @@ router.get('/', async (req, res) => {
   return res.json(sheets)
 })
 
-// router.get('/:sheetId', async (req, res) => {
-//   const sheet = await Sheet.findById(req.params?.sheetId).populate('annotations').select([
-//     'url',
-//     'annotations'
-//   ])
+router.get('/:sheetId', async (req, res) => {
+  const sheet = await Sheet.findById(req.params?.sheetId).populate('annotations').select([
+    'url',
+    'annotations'
+  ])
 
-//   return res.json(sheet)
-// })
+  return res.json(sheet)
+})
 
 router.delete('/:sheetId', async (req, res) => {
   const sheet = await Sheet.findById(req.params?.sheetId).populate('annotations').select([
