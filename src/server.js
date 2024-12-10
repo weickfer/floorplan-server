@@ -16,6 +16,9 @@ app.use(cors())
 
 app.use('/sheets', sheetRoutes);
 app.use('/annotations', annotationsRoutes);
+app.get('/server-status', (req, res) => {
+  return res.send(200)
+})
 
 const PORT = process.env.PORT || 3333;
 
