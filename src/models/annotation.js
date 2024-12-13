@@ -1,13 +1,24 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema, model } from 'mongoose'
 
-const AnnotationSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    filename: String,
-    url: String,
-    vectors: [mongoose.Schema.Types.Mixed],
-    date: { type: Date, default: Date.now },
-    sheet: { type: mongoose.Schema.Types.ObjectId, ref: 'Sheet' },
+const AttachmentSchema = new Schema({
+  name: String,
+  vectors: [mongoose.Schema.Types.Mixed],
+  publicUrl: String,
+})
+
+const AnnotationSchema = new Schema({
+  title: String,
+  description: String,
+  visibility: String,
+  priority: String,
+  type: {
+    type: String,
+    default: 'document'
+  },
+  disciplines: [mongoose.Schema.Types.Mixed],
+  attachments: [AttachmentSchema],
+
+  document: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
 });
 
-module.exports = mongoose.model('Annotation', AnnotationSchema);
+export const Annotation = model('Annotation', AnnotationSchema)

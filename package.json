@@ -2,6 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "engines": {
     "node": "20"
@@ -9,6 +10,7 @@
   "scripts": {
     "build": "node build.js",
     "start": "node src/server.js",
+    "dev:watch": "node --env-file=.env.local --watch src/server.js",
     "dev": "node --env-file=.env.local src/server.js"
   },
   "keywords": [],

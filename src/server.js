@@ -1,11 +1,11 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+import 'dotenv/config'
 
-const connectDB = require('./lib/mongo');
+import express from 'express'
+import cors from 'cors'
 
-const sheetRoutes = require('./routes/sheets');
-const annotationsRoutes = require('./routes/annotations');
+import { connectDB } from './lib/mongo.js';
+import { documentsRouter } from './router/documents.js';
+import { annotationsRouter } from './router/annotations.js';
 
 connectDB();
 
@@ -14,11 +14,12 @@ const app = express();
 app.use(express.json())
 app.use(cors())
 
-app.use('/sheets', sheetRoutes);
-app.use('/annotations', annotationsRoutes);
+
 app.get('/server-status', (req, res) => {
   return res.send(200)
 })
+app.use('/documents', documentsRouter)
+app.use('/annotations', annotationsRouter)
 
 const PORT = process.env.PORT || 3333;
 
