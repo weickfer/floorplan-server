@@ -4,6 +4,8 @@ import config from './knexfile.js'
 // Configure o knex com a configuração do seu banco de dados (conforme o knexfile)
 const db = knex(config);
 
+console.log(config)
+
 async function runMigrations() {
   try {
     console.log('Iniciando migrações...');
