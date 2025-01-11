@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createDocument } from "../use-cases/create-document.js";
-import { Document } from "../models/document.js";
+import { createDocument } from "../../use-cases/v1/create-document.js";
+import { Document } from "../../models/document.js";
 
 export const documentsRouter = Router()
 

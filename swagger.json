@@ -1,0 +1,997 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Anotações",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3333"
+    }
+  ],
+  "security": [
+    {
+      "AccessTokenAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "AccessTokenAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-access-token",
+        "description": "Forneça o token de acesso"
+      },
+      "ParentPlatformAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-platform-token",
+        "description": "Acesso restrito à plataforma. Forneça a chave da plataforma no cabeçalho."
+      }
+    },
+    "schemas": {
+      "CreateDiscipline": {
+        "type": "object",
+        "properties": {
+          "disciplineId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deadline": {
+            "type": "string",
+            "example": "2025-01-07"
+          },
+          "completedIn": {
+            "type": "string",
+            "example": "2025-01-06"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status da disciplina",
+            "example": "c"
+          }
+        },
+        "required": [
+          "disciplineId",
+          "deadline",
+          "completedIn",
+          "status"
+        ]
+      },
+      "CreateAttachment": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "example": "parada.jpg"
+          },
+          "vectors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {},
+              "example": {
+                "x": 10,
+                "y": 1,
+                "radius": 10,
+                "type": "circle"
+              }
+            },
+            "description": "Lista de vetores associados ao anexo"
+          }
+        },
+        "required": [
+          "name",
+          "vectors"
+        ]
+      },
+      "CreateAnnotation": {
+        "type": "object",
+        "properties": {
+          "objectId": {
+            "type": "string",
+            "description": "Identificador único do objeto analisado"
+          },
+          "title": {
+            "type": "string",
+            "example": "Parada"
+          },
+          "description": {
+            "type": "string",
+            "example": "Falta terminar a parte de acessibilidade"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "public",
+              "draft",
+              "group",
+              "admin"
+            ],
+            "description": "Nível de visibilidade da anotação",
+            "example": "public"
+          },
+          "groupId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Id do Grupo que poderá visualizar a anotação",
+            "example": "62f058a0-4b71-49f6-bb41-f9dab75e92cb"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "description": "Prioridade da anotação",
+            "example": "high"
+          },
+          "disciplines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateDiscipline"
+            },
+            "description": "Lista de disciplinas"
+          },
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateAttachment"
+            },
+            "description": "Lista de anexos"
+          }
+        },
+        "required": [
+          "objectId",
+          "title",
+          "description",
+          "visibility",
+          "priority",
+          "disciplines",
+          "attachments"
+        ]
+      },
+      "Discipline": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateDiscipline"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "slug"
+            ]
+          }
+        ]
+      },
+      "Attachment": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateAttachment"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "publicUrl": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "id",
+              "publicUrl"
+            ]
+          }
+        ]
+      },
+      "Annotation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateAnnotation"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "disciplines": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Discipline"
+                },
+                "description": "Lista de disciplinas"
+              },
+              "attachments": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Attachment"
+                },
+                "description": "Lista de anexos"
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        ]
+      },
+      "CreateGroup": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Grupo #1"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "1234",
+              "2345",
+              "1456"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "members"
+        ]
+      },
+      "Group": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateGroup"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "projectId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "ownerId": {
+                "type": "string",
+                "format": "uuid"
+              }
+            },
+            "required": [
+              "id",
+              "projectId",
+              "ownerId"
+            ]
+          }
+        ]
+      },
+      "CreateProject": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Valec"
+          },
+          "externalProjectId": {
+            "type": "string",
+            "example": "PROJ-001"
+          }
+        },
+        "required": [
+          "name",
+          "externalProjectId"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/v2/annotations": {
+      "post": {
+        "summary": "Criar uma nova anotação",
+        "description": "Endpoint responsável pela criação de uma nova anotação no sistema. \n    Após a criação bem-sucedida, o serviço retorna uma lista de URLs únicas associadas a cada anexo, \n    que deverão ser utilizadas para realizar o upload dos arquivos no cliente. \n    Essas URLs são temporárias e específicas para o processo de upload.",
+        "tags": [
+          "Anotação"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnnotation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Anotação criada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "signedUrls": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        }
+                      },
+                      "required": [
+                        "signedUrls"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Caso **visibility** é igual a group, o campo **groupId** é obrigatório.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error | ValidationError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "'groupId' deveria estar incluso quando visibility é 'group'"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Disciplinas inclusas não existem, ou grupo inserido não existe/sem membros.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error | ValidationError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Alguma informação inserida não exite no banco dados."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error | ValidationError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Você não pertence a esse grupo"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Obter anotações",
+        "description": "Esta rota retorna uma lista de anotações, levando em consideração a visibilidade de cada um. As anotações podem ser públicas, rascunho ou restritos a determinados grupos de usuários, e a resposta será ajustada conforme as permissões do usuário autenticado.",
+        "tags": [
+          "Anotação"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Annotation"
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/annotations/{id}": {
+      "delete": {
+        "summary": "Deletar uma anotação",
+        "description": "Rota para deletar uma anotação.",
+        "tags": [
+          "Anotação"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Anotação deletada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Você precisa ser o autor dessa anotação para deletá-la.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error | ValidationError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Somente o autor da anotação pode deletá-la"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Anotação não existente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error | ValidationError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Anotação não existe"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/groups": {
+      "post": {
+        "summary": "Criar um grupo",
+        "description": "Endpoint responsável pela criação de um novo grupo no sistema.",
+        "tags": [
+          "Grupo"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Anotação criada com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar grupos",
+        "description": "Esta rota retorna uma lista de grupos do projeto que o usuário faz parte.",
+        "tags": [
+          "Grupo"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Group"
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/groups/{id}": {
+      "delete": {
+        "summary": "Deletar um grupo",
+        "description": "Rota para deletar um grupo.",
+        "tags": [
+          "Grupo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Grupo deletado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/disciplines": {
+      "get": {
+        "tags": [
+          "Projeto"
+        ],
+        "summary": "Lista disciplinas padrões",
+        "description": "Lista todas as disciplinas padrões.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "allOf": [
+                          {
+                            "$ref": "#/components/schemas/Discipline"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "name": {
+                                "type": "string",
+                                "example": "Engenharia"
+                              },
+                              "slug": {
+                                "type": "string",
+                                "example": "ENG"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "slug"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/projects/disciplines": {
+      "post": {
+        "summary": "Associar disciplinas padrões ao projeto",
+        "tags": [
+          "Projeto"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "disciplinesIDs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                },
+                "required": [
+                  "disciplinesIDs"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Disciplinas adicionadas com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Disciplinas inseridas não existem.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error | ValidationError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Algumas disciplinas inseridas não exitem"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/projects/disciplines/custom": {
+      "post": {
+        "summary": "Adicionar disciplina customizada",
+        "tags": [
+          "Projeto"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "slug": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "slug"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Disciplinas adicionadas com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/projects": {
+      "post": {
+        "summary": "Criar um projeto ",
+        "security": [
+          {
+            "ParentPlatformAuth": []
+          }
+        ],
+        "description": "Endpoint responsável pela criação de um novo grupo no sistema.",
+        "tags": [
+          "Somente para servidores autorizados"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProject"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Projeto criado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Existe um projeto já cadastrado com este ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error | ValidationError"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Projeto já cadastrado na base de dados"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/projects/{externalProjectId}": {
+      "delete": {
+        "summary": "Deletar um projeto",
+        "security": [
+          {
+            "ParentPlatformAuth": []
+          }
+        ],
+        "description": "Rota para deletar um projeto e todos seus relacionados.",
+        "tags": [
+          "Somente para servidores autorizados"
+        ],
+        "parameters": [
+          {
+            "name": "externalProjectId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Projeto deletado com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

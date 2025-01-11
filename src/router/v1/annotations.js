@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { createAnnotation } from "../use-cases/create-annotation.js";
-import { createDocumentAnnotation } from "../use-cases/create-document-annotation.js";
-import { getAnnotationsByDocument } from "../use-cases/get-annotations.by-document.js";
-import { getAnnotationsByType } from "../use-cases/get-annotations-by-type.js";
+import { createAnnotation } from "../../use-cases/v1/create-annotation.js";
+import { createDocumentAnnotation } from "../../use-cases/v1/create-document-annotation.js";
+import { getAnnotationsByDocument } from "../../use-cases/v1/get-annotations.by-document.js";
+import { getAnnotationsByType } from "../../use-cases/v1/get-annotations-by-type.js";
 
 export const annotationsRouter = Router()
 

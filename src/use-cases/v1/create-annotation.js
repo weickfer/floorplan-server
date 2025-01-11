@@ -1,5 +1,5 @@
-import { createSignedUploadUrl } from "../lib/supabase.js";
-import { Annotation } from "../models/annotation.js";
+import { createSignedUploadUrl } from "../../lib/supabase.js";
+import { Annotation } from "../../models/annotation.js";
 
 export async function createAnnotation(
   { title, description, visibility, priority, type, disciplines, attachments: _attachments }

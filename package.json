@@ -11,17 +11,24 @@
     "build": "node build.js",
     "start": "node src/server.js",
     "dev:watch": "node --env-file=.env.local --watch src/server.js",
-    "dev": "node --env-file=.env.local src/server.js"
+    "dev": "node --env-file=.env.local src/server.js",
+    "docs:generate": "node src/lib/zod/docs/generate.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.0",
     "@supabase/supabase-js": "^2.45.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
     "mongoose": "^8.7.1",
-    "nanoid": "^5.0.7"
+    "nanoid": "^5.0.7",
+    "pg": "^8.13.1",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.24.1"
   }
 }
