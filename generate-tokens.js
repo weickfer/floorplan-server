@@ -24,6 +24,12 @@ const cintia = {
   roles: []
 }
 
+const maria = {
+  sub: '9b8b3ab5-4f45-41c9-8c73-a7c40f51a3cc',
+  projectId: '457823',
+  roles: []
+}
+
 const privateKey = readFileSync('./private.key')
 // const publicKey = readFileSync('./public.key')
 
@@ -31,7 +37,7 @@ function createToken(data) {
   return jwt.sign(data, privateKey, { algorithm: 'RS256', expiresIn: '1d' })
 }
 
-[user, admin, server, cintia].map(data => ({
+[user, admin, server, cintia, maria].map(data => ({
   token: createToken(data),
   sub: data.sub,
 })).forEach(data => {
