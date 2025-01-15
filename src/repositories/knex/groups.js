@@ -51,4 +51,10 @@ export class KnexGroupsRepository {
   async delete(id) {
     await k('groups').where('id', id).delete()
   }
+
+  async removeMember(memberId) {
+    await k.raw(`
+      DELETE FROM group_members WHERE group_members."memberId" = ?
+    `, [memberId])
+  }
 }

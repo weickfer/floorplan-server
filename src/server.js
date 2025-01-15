@@ -1,17 +1,17 @@
-import 'dotenv/config'
+import 'dotenv/config';
 
-import express from 'express'
-import swaggerUI from 'swagger-ui-express'
-import cors from 'cors'
+import cors from 'cors';
+import express from 'express';
+import swaggerUI from 'swagger-ui-express';
 
-import { connectDB } from './lib/mongo.js';
-import { v1Router } from './router/v1/index.js';
-import { ResponseError } from './infra/errors/response-error.js';
-import { v2Router } from './router/v2/index.js';
-import { openApiDocument } from './lib/zod/docs/index.js';
+// import { connectDB } from './lib/mongo.js';
 import { ZodError } from 'zod';
+import { ResponseError } from './infra/errors/response-error.js';
+import { openApiDocument } from './lib/zod/docs/index.js';
+import { v1Router } from './router/v1/index.js';
+import { v2Router } from './router/v2/index.js';
 
-connectDB();
+// connectDB();
 
 const app = express();
 

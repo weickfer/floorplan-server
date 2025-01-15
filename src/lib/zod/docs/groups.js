@@ -1,8 +1,8 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 
-import { z } from '../index.js'
-import { defaultOkResponseSchema } from "./response-schema.js";
-import { createGroupSchema, groupSchema } from "../schemas/group.js";
+import { z } from '../index.js';
+import { createGroupSchema, groupSchema, removeMemberSchema } from "../schemas/group.js";
+import { defaultBadResponseSchema, defaultOkResponseSchema } from "./response-schema.js";
 
 
 /**
@@ -78,6 +78,56 @@ export function groupsDoc(registry) {
           }
         }
       }
+    }
+  })
+
+  registry.registerPath({
+    method: 'patch',
+    path: '/v2/groups/{id}/remove-member',
+    summary: 'Remover membro',
+    description: 'Remover membro de um determinado grupo. Somente o dono do grupo pode realizar essa operação.',
+    tags: ['Grupo'],
+    parameters: [
+      {
+        name: 'id',
+        in: 'path',
+        required: true
+      }
+    ],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: removeMemberSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      204: {
+        description: 'Membro removido com sucesso.',
+        content: {
+          "application/json": {
+            schema: defaultOkResponseSchema(z.object({}))
+          }
+        }
+      },
+      404: {
+        description: 'Grupo não existe.',
+        content: {
+          "application/json": {
+            schema: defaultBadResponseSchema(z.string('Grupo não existe'))
+          }
+        }
+      },
+      401: {
+        description: 'Operação não permitida.',
+        content: {
+          "application/json": {
+            schema: defaultBadResponseSchema(z.string('Somente o dono do grupo pode fazer essa operação'))
+          }
+        }
+      },
     }
   })
 }

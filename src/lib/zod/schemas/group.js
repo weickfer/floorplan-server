@@ -17,3 +17,6 @@ export const deleteGroupSchema = z.object({
   }),
 }).openapi('DeleteGroupParams')
 
+export const removeMemberSchema = z.object({
+  memberId: z.string(),
+})
