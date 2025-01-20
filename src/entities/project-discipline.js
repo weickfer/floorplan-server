@@ -1,11 +1,11 @@
-import { randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto';
 
 export class ProjectDiscipline {
   #props;
 
-  constructor({ name, slug, type, projectId }, id) {
+  constructor({ name, slug, type, projectId, annotationsCount }, id) {
     this.id = id ?? randomUUID()
-    this.#props = { name, slug, type, projectId }
+    this.#props = { name, slug, type, projectId, annotationsCount }
   }
 
   get name() {
@@ -22,6 +22,10 @@ export class ProjectDiscipline {
   
   get projectId() {
     return this.#props.projectId;
+  }
+  
+  get annotationsCount() {
+    return this.#props.annotationsCount;
   }
   
 }

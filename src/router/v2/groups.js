@@ -6,6 +6,7 @@ import { knexGroupsRepository } from "../../repositories/knex/index.js";
 
 import { CreateGroupUseCase } from "../../use-cases/v2/groups/create-group.js";
 import { DeleteGroupUseCase } from "../../use-cases/v2/groups/delete-group.js";
+import { EditGroupUseCase } from "../../use-cases/v2/groups/edit-group.js";
 import { ListGroupsUseCase } from "../../use-cases/v2/groups/list-groups.js";
 import { RemoveMemberUseCase } from "../../use-cases/v2/groups/remove-member.js";
 
@@ -19,6 +20,9 @@ const deleteGroupUseCase = new DeleteGroupUseCase(
   knexGroupsRepository
 )
 const removeMemberUseCase = new RemoveMemberUseCase(
+  knexGroupsRepository
+)
+const editGroupUseCase = new EditGroupUseCase(
   knexGroupsRepository
 )
 
@@ -47,4 +51,10 @@ groupsRouter.patch(
   '/:id/remove-member',
   adaptMiddleware(authMiddleware),
   adaptRoute(removeMemberUseCase)
+)
+
+groupsRouter.put(
+  '/:id/edit',
+  adaptMiddleware(authMiddleware),
+  adaptRoute(editGroupUseCase)
 )

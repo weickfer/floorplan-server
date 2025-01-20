@@ -20,3 +20,8 @@ export const deleteGroupSchema = z.object({
 export const removeMemberSchema = z.object({
   memberId: z.string(),
 })
+
+export const editGroupSchema = z.object({
+  name: z.string().optional(), 
+  addMembers: z.array(z.string()),
+})

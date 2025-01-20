@@ -7,6 +7,7 @@ export class ProjectDisciplineMapper {
       slug: data.slug,
       projectId: data.projectId,
       type: data.type,
+      annotationsCount: Number(data.annotationsCount),
     }, data.id)
   }
 

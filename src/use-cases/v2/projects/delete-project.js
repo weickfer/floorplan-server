@@ -1,4 +1,4 @@
-import { NotFoundError } from "../../../infra/errors/4xx.js"
+import { NotFoundError } from "../../../infra/errors/4xx.js";
 import { deleteProjectSchema } from "../../../lib/zod/schemas/project.js";
 
 export class DeleteProjectUseCase {
@@ -30,7 +30,7 @@ export class DeleteProjectUseCase {
     await this.projectsRepo.delete(project.id)
 
     return {
-      statusCode: 204,
+      statusCode: 200,
       body: {}
     }
     // puxar todos os anexos vinculados a esse projeto e deletar

@@ -41,4 +41,27 @@ export class KnexProjectDisciplinesRepository {
 
     return ids.every(id => disciplines.map(d => d.id).includes(id));
   }
+
+  async findById(id) {
+    const discipline = await k('project_disciplines')
+    .where({ id })
+    .select(
+      'project_disciplines.*',
+      k.raw(`
+        (
+          SELECT COUNT(*)
+          FROM annotation_disciplines
+          WHERE annotation_disciplines."disciplineId" = project_disciplines.id
+        ) as "annotationsCount"
+      `)
+    ).first()
+
+    if(!discipline) return null;
+
+    return ProjectDisciplineMapper.toEntity(discipline)
+  }
+
+  async delete(id) {
+    await k('project_disciplines').where('id', id).delete()
+  }
 }

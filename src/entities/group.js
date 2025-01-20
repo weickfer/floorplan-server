@@ -3,8 +3,8 @@ import { randomUUID } from 'node:crypto'
 export class Group {
   #props
 
-  constructor({ projectId, ownerId, name, membersIds }, id) {
-    this.#props = { projectId, ownerId, name, membersIds }
+  constructor({ projectId, ownerId, name, membersIds, annotationsCount }, id) {
+    this.#props = { projectId, ownerId, name, membersIds, annotationsCount }
     this.id = id ?? randomUUID()
   }
 
@@ -22,5 +22,13 @@ export class Group {
   
   get membersIds() {
     return this.#props.membersIds
+  }
+  
+  get annotationsCount() {
+    return this.#props.annotationsCount
+  }
+
+  logProps() {
+    console.log(this.#props)
   }
 }

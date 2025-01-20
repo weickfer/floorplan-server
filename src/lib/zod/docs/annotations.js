@@ -1,6 +1,6 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 
-import { z } from '../index.js'
+import { z } from '../index.js';
 import { createAnnotationSchema, listAnnotations } from "../schemas/annotation.js";
 import { defaultBadResponseSchema, defaultOkResponseSchema } from "./response-schema.js";
 
@@ -126,7 +126,7 @@ export function annotationsDoc(registry) {
       }
     ],
     responses: {
-      204: {
+      200: {
         description: 'Anotação deletada com sucesso.',
         content: {
           'application/json': {

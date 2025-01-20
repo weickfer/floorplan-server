@@ -34,7 +34,7 @@ export class DeleteAnnotationUseCase {
     await this.annotationsRepo.delete(id)
 
     return {
-      statusCode: 204,
+      statusCode: 200,
       body: {}
     }
   }

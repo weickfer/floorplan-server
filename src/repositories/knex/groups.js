@@ -41,7 +41,26 @@ export class KnexGroupsRepository {
   }
 
   async findById(id) {
-    const group = await k('groups').where({ id }).first()
+    const group = await k('groups')
+      .where({ id })
+      .select(
+        'groups.*',
+        k.raw(`
+          (
+            SELECT COUNT(*)
+            FROM annotations
+            WHERE annotations."groupId" = groups.id
+          ) as "annotationsCount"
+        `),
+        k.raw(`
+          (
+            SELECT json_agg(group_members."memberId")
+            FROM group_members
+            WHERE group_members."groupId" = groups.id
+          ) AS "membersIds"
+        `)
+      )
+      .first()
 
     if(!group) return null
 
@@ -50,6 +69,21 @@ export class KnexGroupsRepository {
   
   async delete(id) {
     await k('groups').where('id', id).delete()
+  }
+
+  async update({ id, name, membersIds }) {
+    await k('groups').where('id', id).update({
+      name
+    })
+
+    const newMembers = membersIds.map(memberId => ({
+      groupId: id,
+      memberId,
+    }))
+
+    if(newMembers.length === 0) return
+
+    await k('group_members').insert(newMembers)
   }
 
   async removeMember(memberId) {

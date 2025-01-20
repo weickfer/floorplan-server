@@ -1,5 +1,5 @@
+import { ConflictError, UnauthorizedError } from '../../../infra/errors/4xx.js'
 import { deleteGroupSchema } from "../../../lib/zod/schemas/group.js"
-import { UnauthorizedError } from '../../../infra/errors/4xx.js'
 
 export class DeleteGroupUseCase {
   constructor(
@@ -17,10 +17,14 @@ export class DeleteGroupUseCase {
       throw new UnauthorizedError('Somente o dono do grupo pode deletá-lo')
     }
 
+    if(group?.annotationsCount > 0) {
+      throw new ConflictError('Existem anotações associadas a este grupo')
+    }
+
     await this.groupsRepo.delete(id)
 
     return {
-      statusCode: 204,
+      statusCode: 200,
       body: {}
     }
   }

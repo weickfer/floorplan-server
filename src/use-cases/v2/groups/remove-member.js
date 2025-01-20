@@ -24,7 +24,7 @@ export class RemoveMemberUseCase {
     await this.groupsRepo.removeMember(memberId)
 
     return {
-      statusCode: 204,
+      statusCode: 200,
       body: {}
     }
   }

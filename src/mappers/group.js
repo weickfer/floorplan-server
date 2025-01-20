@@ -6,7 +6,8 @@ export class GroupMapper {
       name: data.name,
       membersIds: data.membersIds,
       ownerId: data.ownerId,
-      projectId: data.projectId
+      projectId: data.projectId,
+      annotationsCount: Number(data.annotationsCount)
     }, data.id)
   }
 

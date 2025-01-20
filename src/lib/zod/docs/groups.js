@@ -1,7 +1,7 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 
 import { z } from '../index.js';
-import { createGroupSchema, groupSchema, removeMemberSchema } from "../schemas/group.js";
+import { createGroupSchema, editGroupSchema, groupSchema, removeMemberSchema } from "../schemas/group.js";
 import { defaultBadResponseSchema, defaultOkResponseSchema } from "./response-schema.js";
 
 
@@ -70,7 +70,7 @@ export function groupsDoc(registry) {
       }
     ],
     responses: {
-      204: {
+      200: {
         description: 'Grupo deletado com sucesso.',
         content: {
           "application/json": {
@@ -104,7 +104,7 @@ export function groupsDoc(registry) {
       },
     },
     responses: {
-      204: {
+      200: {
         description: 'Membro removido com sucesso.',
         content: {
           "application/json": {
@@ -116,7 +116,9 @@ export function groupsDoc(registry) {
         description: 'Grupo não existe.',
         content: {
           "application/json": {
-            schema: defaultBadResponseSchema(z.string('Grupo não existe'))
+            schema: defaultBadResponseSchema(
+              z.string().openapi({ example: 'Grupo não existe' })
+            )
           }
         }
       },
@@ -124,7 +126,63 @@ export function groupsDoc(registry) {
         description: 'Operação não permitida.',
         content: {
           "application/json": {
-            schema: defaultBadResponseSchema(z.string('Somente o dono do grupo pode fazer essa operação'))
+            schema: defaultBadResponseSchema(
+              z.string().openapi({ example: 'Somente o dono do grupo pode fazer essa operação' })
+            )
+          }
+        }
+      },
+    }
+  })
+  
+  registry.registerPath({
+    method: 'put',
+    path: '/v2/groups/{id}/edit',
+    summary: 'Editar Grupo',
+    description: 'Editar grupo. Somente o dono do grupo pode realizar essa operação.',
+    tags: ['Grupo'],
+    parameters: [
+      {
+        name: 'id',
+        in: 'path',
+        required: true
+      }
+    ],
+    request: {
+      body: {
+        content: {
+          'application/json': {
+            schema: editGroupSchema,
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: 'Grupo editado com sucesso.',
+        content: {
+          "application/json": {
+            schema: defaultOkResponseSchema(z.object({}))
+          }
+        }
+      },
+      404: {
+        description: 'Grupo não existe.',
+        content: {
+          "application/json": {
+            schema: defaultBadResponseSchema(
+              z.string().openapi({ example: 'Grupo não existe' })
+            )
+          }
+        }
+      },
+      401: {
+        description: 'Operação não permitida.',
+        content: {
+          "application/json": {
+            schema: defaultBadResponseSchema(
+              z.string().openapi({ example: 'Somente o dono do grupo pode fazer essa operação' })
+            )
           }
         }
       },
