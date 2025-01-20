@@ -1,3 +1,4 @@
 *.local
 public
 node_modules
+local
